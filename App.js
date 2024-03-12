@@ -14,8 +14,11 @@ import {
   BluetoothTscPrinter,
 } from 'react-native-bluetooth-escpos-printer';
 
+import SamplePrint from './SamplePrint';
+
 export default App = () => {
   const [data, setData] = useState([]);
+  const [foundData, setFoundData] = useState([]);
   let arr = [];
   const enableBluetooth = () => {
     BluetoothManager.isBluetoothEnabled()
@@ -48,12 +51,8 @@ export default App = () => {
           .then(resolve => {
             let objects = JSON.parse(resolve);
             const {paired, found} = objects;
-            // for (let i = 0; i < paired.length; i++) {
-            //   let device = paired[i];
-            //   const {name, address} = device;
-            //   console.log(name, address);
-            // }
             setData(paired);
+            setFoundData(found);
           })
           .catch(reject => {
             alert(reject);
@@ -66,15 +65,14 @@ export default App = () => {
     }
   };
 
-  const ConnectBluetooth = address => {
-    BluetoothManager.connect(address)
+  const ConnectBluetooth = async address => {
+    await BluetoothManager.connect(address)
       .then(resolve => {
         console.log(resolve);
       })
       .catch(reject => {
-        console.log('reject' + reject);
+        console.log('reject : ' + reject);
       });
-    console.log(address);
   };
 
   const Item = ({name, address}) => (
@@ -82,7 +80,23 @@ export default App = () => {
       <View
         style={{
           margin: 5,
-          backgroundColor: 'red',
+          backgroundColor: 'blue',
+          height: 50,
+          width: 'auto',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+        <Text style={{color: '#ffffff'}}>{name}</Text>
+        <Text style={{color: '#ffffff'}}>{address}</Text>
+      </View>
+    </TouchableOpacity>
+  );
+  const Item1 = ({name, address}) => (
+    <TouchableOpacity onPress={() => ConnectBluetooth(address)}>
+      <View
+        style={{
+          margin: 5,
+          backgroundColor: 'blue',
           height: 50,
           width: 'auto',
           alignItems: 'center',
@@ -96,12 +110,22 @@ export default App = () => {
 
   return (
     <View>
+      <SamplePrint />
       <Button title="enable" onPress={enableBluetooth} />
       <Button title="scan" onPress={acessLocation} />
+      <Text>Paired Devices</Text>
       <FlatList
         data={data}
         renderItem={({item}) => (
           <Item name={item.name} address={item.address} />
+        )}
+        keyExtractor={item => item.address}
+      />
+      <Text>Found devices</Text>
+      <FlatList
+        data={foundData}
+        renderItem={({item}) => (
+          <Item1 name={item.name} address={item.address} />
         )}
         keyExtractor={item => item.address}
       />

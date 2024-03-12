@@ -1,158 +1,45 @@
-import React from 'react';
-import {Button, StyleSheet, Text, View} from 'react-native';
+import React, {useState} from 'react';
+import {Button, StyleSheet, Text, TextInput, View} from 'react-native';
 import {BluetoothEscposPrinter} from 'react-native-bluetooth-escpos-printer';
-import {hsdLogo} from './dummy-logo';
 
-async function printreciept() {
-  const columnWidths = [24, 24];
-  const receiptNo = 120;
-  const receiptDate = new Date();
-  const originalAccount = '1239';
-  const branch = 'Branch Name';
-  const telephone = '123-456-7890';
-  const salesman = 'John Doe';
-  const productCode = 'P123';
-  const amount = '500.00';
-  const discount = '50.00';
-  const amountReceived = '450.00';
-  const paymentMethod = 'Credit Card';
-  const receivedFrom = 'John Smith';
-  const fcuser = 'Rukshan';
-  const collectionRecieptNo = 121;
-
+const printreciept = async value => {
   try {
     await BluetoothEscposPrinter.printerAlign(
       BluetoothEscposPrinter.ALIGN.CENTER,
     );
-    await BluetoothEscposPrinter.printText(' ABC India PLC', {align: 'center'});
-    await BluetoothEscposPrinter.printText('\r\n', {});
+    await BluetoothEscposPrinter.setBlob(0);
 
-    await BluetoothEscposPrinter.printText(
-      collectionRecieptNo + 'COLLECTION RECIEPT',
-      {},
-    );
-
-    await BluetoothEscposPrinter.printText('\r\n\r\n\r\n', {});
-
-    await BluetoothEscposPrinter.printColumn(
-      [48],
-      [BluetoothEscposPrinter.ALIGN.LEFT],
-      ['Receipt No: ' + receiptNo],
-      {},
-    );
-
-    await BluetoothEscposPrinter.printColumn(
-      [48],
-      [BluetoothEscposPrinter.ALIGN.LEFT],
-      ['Receipt Date: ' + receiptDate],
-      {},
-    );
-
-    await BluetoothEscposPrinter.printColumn(
-      [48],
-      [BluetoothEscposPrinter.ALIGN.LEFT],
-      ['Original A/C:' + originalAccount],
-      {},
-    );
-
-    await BluetoothEscposPrinter.printText('\r\n', {});
-
-    await BluetoothEscposPrinter.printColumn(
-      [48],
-      [BluetoothEscposPrinter.ALIGN.LEFT],
-      ['Branch:' + branch],
-      {},
-    );
-
-    await BluetoothEscposPrinter.printColumn(
-      [48],
-      [BluetoothEscposPrinter.ALIGN.LEFT],
-      ['Telephone:' + telephone],
-      {},
-    );
-
-    await BluetoothEscposPrinter.printColumn(
-      [48],
-      [BluetoothEscposPrinter.ALIGN.LEFT],
-      ['Salesman:' + salesman],
-      {},
-    );
-
-    await BluetoothEscposPrinter.printColumn(
-      [48],
-      [BluetoothEscposPrinter.ALIGN.LEFT],
-      ['Product Code:' + productCode],
-      {},
-    );
-
-    await BluetoothEscposPrinter.printText('\r\n', {});
-
-    await BluetoothEscposPrinter.printColumn(
-      [48],
-      [BluetoothEscposPrinter.ALIGN.LEFT],
-      ['Amount:' + amount + '/='],
-      {},
-    );
-
-    await BluetoothEscposPrinter.printColumn(
-      [48],
-      [BluetoothEscposPrinter.ALIGN.LEFT],
-      ['Discount:' + discount + '/='],
-      {},
-    );
-
-    await BluetoothEscposPrinter.printColumn(
-      [48],
-      [BluetoothEscposPrinter.ALIGN.LEFT],
-      ['Amount Received:' + amountReceived + '/='],
-      {},
-    );
-
-    await BluetoothEscposPrinter.printColumn(
-      [48],
-      [BluetoothEscposPrinter.ALIGN.LEFT],
-      ['Payment Method:' + paymentMethod],
-      {},
-    );
-
-    await BluetoothEscposPrinter.printText('\r\n', {});
-
-    await BluetoothEscposPrinter.printColumn(
-      [48],
-      [BluetoothEscposPrinter.ALIGN.LEFT],
-      ['Received From:' + receivedFrom],
-      {},
-    );
-
-    await BluetoothEscposPrinter.printText('\r\n', {});
-
-    await BluetoothEscposPrinter.printColumn(
-      [48],
-      [BluetoothEscposPrinter.ALIGN.LEFT],
-      ['Signature:' + '...................'],
-      {},
-    );
-
-    await BluetoothEscposPrinter.printColumn(
-      [48],
-      [BluetoothEscposPrinter.ALIGN.LEFT],
-      ['Printed By:' + fcuser],
-      {},
-    );
-
-    await BluetoothEscposPrinter.printText('\r\n', {});
+    await BluetoothEscposPrinter.printText(value, {
+      encoding: 'GBK',
+      codepage: 0,
+      widthtimes: 3,
+      heigthtimes: 3,
+      fonttype: 1,
+    });
   } catch (e) {
     alert(e.message || 'ERROR');
   }
-}
+};
 
 const SamplePrint = () => {
+  const [value, setValue] = useState('Useless text');
+  console.log(value);
+  const handlePrint = () => {
+    printreciept(value);
+  };
   return (
     <View>
-      <Text>Sample Print Instruction</Text>
-
+      <TextInput
+        multiline
+        numberOfLines={5}
+        placeholder="Enter the Text To Print"
+        style={{borderWidth: 2}}
+        value={value}
+        onChangeText={setValue}
+      />
+      <Text>Sample Print Instruction {value}</Text>
       <View style={styles.btn}>
-        <Button title="Print Receipt" onPress={printreciept} />
+        <Button title="Print Receipt" onPress={handlePrint} />
       </View>
     </View>
   );
