@@ -132,5 +132,4 @@ export default App = () => {
     </View>
   );
 };
-
 const styles = StyleSheet.create({});
