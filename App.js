@@ -66,8 +66,19 @@ export default App = () => {
     }
   };
 
-  const Item = ({name}) => (
-    <TouchableOpacity>
+  const ConnectBluetooth = address => {
+    BluetoothManager.connect(address)
+      .then(resolve => {
+        console.log(resolve);
+      })
+      .catch(reject => {
+        console.log('reject' + reject);
+      });
+    console.log(address);
+  };
+
+  const Item = ({name, address}) => (
+    <TouchableOpacity onPress={() => ConnectBluetooth(address)}>
       <View
         style={{
           margin: 5,
@@ -78,6 +89,7 @@ export default App = () => {
           justifyContent: 'center',
         }}>
         <Text style={{color: '#ffffff'}}>{name}</Text>
+        <Text style={{color: '#ffffff'}}>{address}</Text>
       </View>
     </TouchableOpacity>
   );
@@ -88,7 +100,9 @@ export default App = () => {
       <Button title="scan" onPress={acessLocation} />
       <FlatList
         data={data}
-        renderItem={({item}) => <Item name={item.name} />}
+        renderItem={({item}) => (
+          <Item name={item.name} address={item.address} />
+        )}
         keyExtractor={item => item.address}
       />
     </View>
