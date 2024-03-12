@@ -3,6 +3,7 @@ import {Button, StyleSheet, Text, TextInput, View} from 'react-native';
 import {BluetoothEscposPrinter} from 'react-native-bluetooth-escpos-printer';
 
 const printreciept = async value => {
+  console.log('print' + value);
   try {
     await BluetoothEscposPrinter.printerAlign(
       BluetoothEscposPrinter.ALIGN.CENTER,
