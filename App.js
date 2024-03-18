@@ -3,9 +3,9 @@ import {
   Text,
   View,
   PermissionsAndroid,
-  Button,
   FlatList,
   TouchableOpacity,
+  ActivityIndicator,
 } from 'react-native';
 import React, {useState} from 'react';
 import {
@@ -19,7 +19,7 @@ import SamplePrint from './SamplePrint';
 export default App = () => {
   const [data, setData] = useState([]);
   const [foundData, setFoundData] = useState([]);
-  let arr = [];
+  const [isScanning, setIsScanning] = useState(false);
   const enableBluetooth = () => {
     BluetoothManager.isBluetoothEnabled()
       .then(enabled => {
@@ -41,6 +41,7 @@ export default App = () => {
   };
 
   const acessLocation = async () => {
+    setIsScanning(true);
     try {
       const granted = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
@@ -56,12 +57,14 @@ export default App = () => {
           })
           .catch(reject => {
             alert(reject);
-          });
+          })
+          .finally(() => setIsScanning(false));
       } else {
         console.log('Location permission denied');
       }
     } catch (err) {
       console.warn(err);
+      setIsScanning(false);
     }
   };
 
@@ -85,6 +88,7 @@ export default App = () => {
           width: 'auto',
           alignItems: 'center',
           justifyContent: 'center',
+          borderRadius: 8,
         }}>
         <Text style={{color: '#ffffff'}}>{name}</Text>
         <Text style={{color: '#ffffff'}}>{address}</Text>
@@ -101,35 +105,76 @@ export default App = () => {
           width: 'auto',
           alignItems: 'center',
           justifyContent: 'center',
+          borderRadius: 8,
         }}>
         <Text style={{color: '#ffffff'}}>{name}</Text>
         <Text style={{color: '#ffffff'}}>{address}</Text>
       </View>
     </TouchableOpacity>
   );
-
   return (
-    <View>
+    <View style={styles.mainContainer}>
       <SamplePrint />
-      <Button title="enable" onPress={enableBluetooth} />
-      <Button title="scan" onPress={acessLocation} />
-      <Text>Paired Devices</Text>
-      <FlatList
-        data={data}
-        renderItem={({item}) => (
-          <Item name={item.name} address={item.address} />
-        )}
-        keyExtractor={item => item.address}
-      />
-      <Text>Found devices</Text>
-      <FlatList
-        data={foundData}
-        renderItem={({item}) => (
-          <Item1 name={item.name} address={item.address} />
-        )}
-        keyExtractor={item => item.address}
-      />
+      {isScanning && <ActivityIndicator size="large" color="#0000ff" />}
+      {data.length > 0 && (
+        <View style={styles.deviceContainer}>
+          <Text style={{fontWeight: 'bold', marginLeft: 6, fontSize: 18}}>
+            Paired Devices
+          </Text>
+          <FlatList
+            data={data}
+            renderItem={({item}) => (
+              <Item name={item.name} address={item.address} />
+            )}
+            keyExtractor={item => item.address}
+          />
+        </View>
+      )}
+      {foundData.length > 0 && (
+        <View style={styles.deviceContainer}>
+          <Text style={{fontWeight: 'bold', marginLeft: 6, fontSize: 18}}>
+            Found devices
+          </Text>
+          <FlatList
+            data={foundData}
+            renderItem={({item}) => (
+              <Item1 name={item.name} address={item.address} />
+            )}
+            keyExtractor={item => item.address}
+          />
+        </View>
+      )}
+      <View style={styles.btnContainer}>
+        <TouchableOpacity
+          onPress={enableBluetooth}
+          style={{backgroundColor: '#0D98D4', padding: 10, borderRadius: 8}}>
+          <Text>Enable Bluetooth</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={acessLocation}
+          style={{backgroundColor: '#0D98D4', padding: 10, borderRadius: 8}}>
+          <Text>Scan Devices</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  mainContainer: {
+    flex: 1,
+  },
+  btnContainer: {
+    position: 'absolute',
+    bottom: 0,
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    justifyContent: 'space-between',
+    marginLeft: 40,
+    gap: 30,
+    padding: 10,
+    borderRadius: 5,
+  },
+  deviceContainer: {
+    height: 250,
+  },
+});
