@@ -1,3 +1,5 @@
+https://github.com/Prasad4521/ThermalPrinter/assets/144436730/68c34708-51e6-40f5-89de-50e399061a1a
+
 This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
 
 # Getting Started
